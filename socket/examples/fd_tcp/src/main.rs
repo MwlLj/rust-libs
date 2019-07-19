@@ -3,7 +3,7 @@ use socket::fd::tcp;
 use std::net::TcpListener;
 
 fn stream2fdTest() {
-    let listener = match TcpListener::bind("0.0.0.0:12345") {
+    let listener = match TcpListener::bind("0.0.0.0:1234") {
         Ok(l) => l,
         Err(err) => {
             assert!(false);
