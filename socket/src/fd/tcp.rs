@@ -4,16 +4,20 @@ use std::net::TcpListener;
 #[cfg(target_os="linux")]
 use std::os::unix::io::AsRawFd;
 #[cfg(target_os="linux")]
+use std::os::unix::io::IntoRawFd;
+#[cfg(target_os="linux")]
 use std::os::unix::io::FromRawFd;
 
 #[cfg(target_os="windows")]
 use std::os::windows::io::AsRawSocket;
 #[cfg(target_os="windows")]
+use std::os::windows::io::IntoRawSocket;
+#[cfg(target_os="windows")]
 use std::os::windows::io::FromRawSocket;
 
 #[cfg(target_os="linux")]
 pub fn stream2fd(stream: TcpStream) -> u64 {
-    TcpStream::as_raw_fd(&stream) as u64
+    TcpStream::into_raw_fd(stream) as u64
 }
 
 #[cfg(target_os="linux")]
@@ -25,7 +29,7 @@ pub fn fd2stream(fd: u64) -> TcpStream {
 
 #[cfg(target_os="windows")]
 pub fn stream2fd(stream: TcpStream) -> u64 {
-    TcpStream::as_raw_socket(&stream)
+    TcpStream::into_raw_socket(stream)
 }
 
 #[cfg(target_os="windows")]
