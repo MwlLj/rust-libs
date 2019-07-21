@@ -8,8 +8,6 @@ use std::io::prelude::*;
 use std::thread;
 use std::time;
 
-use std::os::windows::io::FromRawSocket;
-
 fn stream2fdTest() {
     let listener = match TcpListener::bind("0.0.0.0:1234") {
         Ok(l) => l,
