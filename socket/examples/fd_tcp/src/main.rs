@@ -59,7 +59,39 @@ fn fd2streamTest() {
 	println!("{:?}", &buf[..n]);
 }
 
+fn fd2streamTakeerrorTest() {
+    let listener = match TcpListener::bind("0.0.0.0:1234") {
+        Ok(l) => l,
+        Err(err) => {
+            assert!(false);
+            return;
+        }
+    };
+    for stream in listener.incoming() {
+        let stream = stream.unwrap();
+        let fd = tcp::stream2fd(stream.try_clone().unwrap());
+        println!("fd: {}", fd);
+        match stream.take_error() {
+            Ok(_) => {
+                println!("success");
+            },
+            Err(err) => {
+                println!("err: {}", err);
+            }
+        }
+    }
+    let stream = tcp::fd2stream(1);
+    match stream.take_error() {
+        Ok(_) => {
+        },
+        Err(err) => {
+            println!("err: {}", err);
+        }
+    }
+}
+
 fn main() {
     // stream2fdTest();
-    fd2streamTest();
+    // fd2streamTest();
+    fd2streamTakeerrorTest();
 }
