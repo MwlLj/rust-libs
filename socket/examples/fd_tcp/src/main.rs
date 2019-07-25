@@ -71,9 +71,14 @@ fn fd2streamTakeerrorTest() {
         let stream = stream.unwrap();
         let fd = tcp::stream2fd(stream.try_clone().unwrap());
         println!("fd: {}", fd);
+        let stream = tcp::fd2stream(fd);
         match stream.take_error() {
-            Ok(_) => {
-                println!("success");
+            Ok(r) => {
+                if let None = r {
+                    println!("success");
+                } else {
+                    println!("error");
+                }
             },
             Err(err) => {
                 println!("err: {}", err);
