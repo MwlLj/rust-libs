@@ -15,20 +15,16 @@ impl CConfig {
     pub fn content(&self) -> &str {
         &self.content
     }
+
+    pub fn content_move(self) -> String {
+        self.content
+    }
 }
 
 impl CConfig {
-    pub fn load<T>(path: &str, t: &T) -> Option<CConfig>
-        where T: IDefault {
+    pub fn load_by_str(path: &str, default: String) -> Option<CConfig> {
         let mut content = String::new();
         if !Path::new(path).exists() {
-            let default = match t.default() {
-                Ok(d) => d,
-                Err(err) => {
-                    println!("default() error: {}", err);
-                    return None;
-                }
-            };
             let mut file = match OpenOptions::new()
             .create(true)
             .write(true)
@@ -64,6 +60,18 @@ impl CConfig {
         Some(CConfig{
             content: content
         })
+    }
+
+    pub fn load<T>(path: &str, t: &T) -> Option<CConfig>
+        where T: IDefault {
+        let default = match t.default() {
+            Ok(d) => d,
+            Err(err) => {
+                println!("default() error: {}", err);
+                return None;
+            }
+        };
+        CConfig::load_by_str(path, default)
     }
 }
 
