@@ -72,28 +72,26 @@ impl CWalk {
     }
 }
 
-struct CDefault<'b, DirF: FnMut(&str, &str), FileF: FnMut(&str, &str)> {
+struct CDefault<'b, DirF: FnMut(&str, &str) -> bool, FileF: FnMut(&str, &str) -> bool> {
     dirF: &'b mut DirF,
     fileF: &'b mut FileF
 }
 
 impl<'b, DirF, FileF> IWalk for CDefault<'b, DirF, FileF>
-    where DirF: FnMut(&str, &str)
-    , FileF: FnMut(&str, &str) {
+    where DirF: FnMut(&str, &str) -> bool
+    , FileF: FnMut(&str, &str) -> bool {
     fn on_dir(&mut self, path: &str, name: &str) -> bool {
-        (self.dirF)(path, name);
-        true
+        (self.dirF)(path, name)
     }
 
     fn on_file(&mut self, path: &str, name: &str) -> bool {
-        (self.fileF)(path, name);
-        true
+        (self.fileF)(path, name)
     }
 }
 
 pub fn walk<'a, DirF, FileF>(root: &'a str, dirF: &mut DirF, fileF: &mut FileF) -> Result<(), &'a str>
-    where DirF: FnMut(&str, &str)
-    , FileF: FnMut(&str, &str) {
+    where DirF: FnMut(&str, &str) -> bool
+    , FileF: FnMut(&str, &str) -> bool {
     let mut default = CDefault{
         dirF: dirF,
         fileF: fileF
