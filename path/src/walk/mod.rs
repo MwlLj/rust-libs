@@ -52,12 +52,12 @@ impl CWalk {
             };
             if fileType.is_dir() {
                 if !f.on_dir(path, name) {
-                    return Err("user error")
+                    return Ok(())
                 }
                 self.walk(path, f);
             } else if fileType.is_file() {
                 if !f.on_file(path, name) {
-                    return Err("user error")
+                    return Ok(())
                 }
             }
             // println!("{:?}, {:?}", entry.path().to_str(), entry.file_name());
