@@ -1,8 +1,8 @@
 use std::path;
 
 pub trait IWalk {
-    fn on_dir(&mut self, path: &str, name: &str);
-    fn on_file(&mut self, path: &str, name: &str);
+    fn on_dir(&mut self, path: &str, name: &str) -> bool;
+    fn on_file(&mut self, path: &str, name: &str) -> bool;
 }
 
 pub struct CWalk {
@@ -51,10 +51,14 @@ impl CWalk {
                 }
             };
             if fileType.is_dir() {
-                f.on_dir(path, name);
+                if !f.on_dir(path, name) {
+                    return Err("user error")
+                }
                 self.walk(path, f);
             } else if fileType.is_file() {
-                f.on_file(path, name);
+                if !f.on_file(path, name) {
+                    return Err("user error")
+                }
             }
             // println!("{:?}, {:?}", entry.path().to_str(), entry.file_name());
         }
@@ -76,12 +80,14 @@ struct CDefault<'b, DirF: FnMut(&str, &str), FileF: FnMut(&str, &str)> {
 impl<'b, DirF, FileF> IWalk for CDefault<'b, DirF, FileF>
     where DirF: FnMut(&str, &str)
     , FileF: FnMut(&str, &str) {
-    fn on_dir(&mut self, path: &str, name: &str) {
+    fn on_dir(&mut self, path: &str, name: &str) -> bool {
         (self.dirF)(path, name);
+        true
     }
 
-    fn on_file(&mut self, path: &str, name: &str) {
+    fn on_file(&mut self, path: &str, name: &str) -> bool {
         (self.fileF)(path, name);
+        true
     }
 }
 
@@ -107,12 +113,14 @@ mod test {
     }
 
     impl IWalk for CTest {
-        fn on_dir(&mut self, path: &str, name: &str) {
+        fn on_dir(&mut self, path: &str, name: &str) -> bool {
             println!("dir: path: {}, name: {}", path, name);
+            true
         }
 
-        fn on_file(&mut self, path: &str, name: &str) {
+        fn on_file(&mut self, path: &str, name: &str) -> bool {
             println!("file: path: {}, name: {}", path, name);
+            true
         }
     }
 
