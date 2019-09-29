@@ -103,6 +103,38 @@ pub fn walk<'a, DirF, FileF>(root: &'a str, dirF: &mut DirF, fileF: &mut FileF) 
     Ok(())
 }
 
+pub enum Type {
+    Dir,
+    File
+}
+
+struct COneFnDefault<'a, F: FnMut(&str, &str, Type) -> bool> {
+    f: &'a mut F
+}
+
+impl<'a, F> IWalk for COneFnDefault<'a, F>
+    where F: FnMut(&str, &str, Type) -> bool {
+    fn on_dir(&mut self, path: &str, name: &str) -> bool {
+        (self.f)(path, name, Type::Dir)
+    }
+
+    fn on_file(&mut self, path: &str, name: &str) -> bool {
+        (self.f)(path, name, Type::File)
+    }
+}
+
+pub fn walk_one_fn<'a, F>(root: &'a str, f: &mut F) -> Result<(), &'a str>
+    where F: FnMut(&str, &str, Type) -> bool {
+    let mut default = COneFnDefault{
+        f: f
+    };
+    let walker = CWalk::new();
+    if let Err(err) = walker.walk(root, &mut default) {
+        return Err("walk error");
+    };
+    Ok(())
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
