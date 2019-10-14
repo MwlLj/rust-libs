@@ -22,32 +22,37 @@ impl CWalk {
             let entry = match entry {
                 Ok(e) => e,
                 Err(err) => {
-                    return Err("entry error");
+                    // return Err("entry error");
+                    continue;
                 }
             };
             let fileType = match entry.file_type() {
                 Ok(t) => t,
                 Err(err) => {
-                    return Err("file type error");
+                    // return Err("file type error");
+                    continue;
                 }
             };
             let p = entry.path();
             let path = match p.to_str() {
                 Some(p) => p,
                 None => {
-                    return Err("path to_str error");
+                    // return Err("path to_str error");
+                    continue;
                 }
             };
             let name = match p.file_name() {
                 Some(n) => n,
                 None => {
-                    return Err("file_name error");
+                    // return Err("file_name error");
+                    continue;
                 }
             };
             let name = match name.to_str() {
                 Some(p) => p,
                 None => {
-                    return Err("path to_str error");
+                    // return Err("path to_str error");
+                    continue;
                 }
             };
             if fileType.is_dir() {
