@@ -160,6 +160,7 @@ mod test {
     }
 
     #[test]
+    #[ignore]
     fn walkTest() {
         let walk = CWalk::new();
         walk.walk(".", &mut CTest{});
