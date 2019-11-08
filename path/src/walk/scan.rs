@@ -18,6 +18,7 @@ impl CWalk {
                 return Err("read dir error");
             }
         };
+        let mut ds = Vec::new();
         for entry in dirs {
             let entry = match entry {
                 Ok(e) => e,
@@ -59,13 +60,16 @@ impl CWalk {
                 if !f.on_dir(path, name) {
                     return Ok(())
                 }
-                self.walk(path, f);
+                ds.push(path.to_string());
             } else if fileType.is_file() {
                 if !f.on_file(path, name) {
                     return Ok(())
                 }
             }
             // println!("{:?}, {:?}", entry.path().to_str(), entry.file_name());
+        }
+        for dir in ds {
+            self.walk(&dir, f);
         }
         Ok(())
     }
@@ -167,4 +171,3 @@ mod test {
     }
 }
 
-pub mod scan;
