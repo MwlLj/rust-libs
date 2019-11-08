@@ -26,6 +26,13 @@ fn scanWalkTest(root: &str) {
             walk::scan::Type::File => {
                 println!("{:?}", path);
                 true
+            },
+            walk::scan::Type::OnceEnd => {
+                // println!("onveEnd, path: {}, name: {}", path, name);
+                if name == "cbb" || name == "third" {
+                    return false;
+                }
+                true
             }
         }
     });

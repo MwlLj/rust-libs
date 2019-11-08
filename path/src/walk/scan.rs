@@ -3,6 +3,9 @@ use std::path;
 pub trait IWalk {
     fn on_dir(&mut self, path: &str, name: &str) -> bool;
     fn on_file(&mut self, path: &str, name: &str) -> bool;
+    fn on_once_end(&mut self, path: &str, name: &str) -> bool {
+    	true
+    }
 }
 
 pub struct CWalk {
@@ -68,6 +71,9 @@ impl CWalk {
             }
             // println!("{:?}, {:?}", entry.path().to_str(), entry.file_name());
         }
+        if !f.on_once_end(root, p.file_name().unwrap().to_str().unwrap()) {
+        	return Ok(());
+        }
         for dir in ds {
             self.walk(&dir, f);
         }
@@ -114,7 +120,8 @@ pub fn walk<'a, DirF, FileF>(root: &'a str, dirF: &mut DirF, fileF: &mut FileF) 
 
 pub enum Type {
     Dir,
-    File
+    File,
+    OnceEnd
 }
 
 struct COneFnDefault<'a, F: FnMut(&str, &str, Type) -> bool> {
@@ -129,6 +136,10 @@ impl<'a, F> IWalk for COneFnDefault<'a, F>
 
     fn on_file(&mut self, path: &str, name: &str) -> bool {
         (self.f)(path, name, Type::File)
+    }
+
+    fn on_once_end(&mut self, path: &str, name: &str) -> bool {
+    	(self.f)(path, name, Type::OnceEnd)
     }
 }
 
