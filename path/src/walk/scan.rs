@@ -71,8 +71,35 @@ impl CWalk {
             }
             // println!("{:?}, {:?}", entry.path().to_str(), entry.file_name());
         }
-        if !f.on_once_end(root, p.file_name().unwrap().to_str().unwrap()) {
-        	return Ok(());
+        match p.canonicalize() {
+            Ok(abs) => {
+                match abs.file_name() {
+                    Some(n) => {
+                        match n.to_str() {
+                            Some(s) => {
+                                if !f.on_once_end(root, s) {
+                                    return Ok(());
+                                }
+                            },
+                            None => {
+                                if !f.on_once_end(root, "") {
+                                    return Ok(());
+                                }
+                            }
+                        }
+                    },
+                    None => {
+                        if !f.on_once_end(root, "") {
+                            return Ok(());
+                        }
+                    }
+                }
+            },
+            Err(_) => {
+                if !f.on_once_end(root, "") {
+                    return Ok(());
+                }
+            }
         }
         for dir in ds {
             self.walk(&dir, f);
