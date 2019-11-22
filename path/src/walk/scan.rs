@@ -83,26 +83,26 @@ impl CWalk {
                         match n.to_str() {
                             Some(s) => {
                                 if !f.on_once_end(root, s) {
-                                    return Ok(ResultCode::FunReturn);
+                                    return Ok(ResultCode::NormalReturn);
                                 }
                             },
                             None => {
                                 if !f.on_once_end(root, "") {
-                                    return Ok(ResultCode::FunReturn);
+                                    return Ok(ResultCode::NormalReturn);
                                 }
                             }
                         }
                     },
                     None => {
                         if !f.on_once_end(root, "") {
-                            return Ok(ResultCode::FunReturn);
+                            return Ok(ResultCode::NormalReturn);
                         }
                     }
                 }
             },
             Err(_) => {
                 if !f.on_once_end(root, "") {
-                    return Ok(ResultCode::FunReturn);
+                    return Ok(ResultCode::NormalReturn);
                 }
             }
         }
