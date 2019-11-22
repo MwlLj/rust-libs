@@ -11,8 +11,13 @@ pub trait IWalk {
 pub struct CWalk {
 }
 
+pub enum ResultCode {
+    FunReturn,
+    NormalReturn
+}
+
 impl CWalk {
-    pub fn walk<F: IWalk>(&self, root: &str, f: &mut F) -> Result<(), &str> {
+    pub fn walk<F: IWalk>(&self, root: &str, f: &mut F) -> Result<ResultCode, &str> {
         let p = path::Path::new(root);
         let dirs = match p.read_dir() {
             Ok(d) => d,
@@ -61,12 +66,12 @@ impl CWalk {
             };
             if fileType.is_dir() {
                 if !f.on_dir(path, name) {
-                    return Ok(())
+                    return Ok(ResultCode::FunReturn);
                 }
                 ds.push(path.to_string());
             } else if fileType.is_file() {
                 if !f.on_file(path, name) {
-                    return Ok(())
+                    return Ok(ResultCode::FunReturn);
                 }
             }
             // println!("{:?}, {:?}", entry.path().to_str(), entry.file_name());
@@ -78,33 +83,46 @@ impl CWalk {
                         match n.to_str() {
                             Some(s) => {
                                 if !f.on_once_end(root, s) {
-                                    return Ok(());
+                                    return Ok(ResultCode::FunReturn);
                                 }
                             },
                             None => {
                                 if !f.on_once_end(root, "") {
-                                    return Ok(());
+                                    return Ok(ResultCode::FunReturn);
                                 }
                             }
                         }
                     },
                     None => {
                         if !f.on_once_end(root, "") {
-                            return Ok(());
+                            return Ok(ResultCode::FunReturn);
                         }
                     }
                 }
             },
             Err(_) => {
                 if !f.on_once_end(root, "") {
-                    return Ok(());
+                    return Ok(ResultCode::FunReturn);
                 }
             }
         }
         for dir in ds {
-            self.walk(&dir, f);
+            match self.walk(&dir, f) {
+                Ok(code) => {
+                    match code {
+                        ResultCode::NormalReturn => {
+                        },
+                        ResultCode::FunReturn => {
+                            return Ok(ResultCode::NormalReturn);
+                        }
+                    }
+                },
+                Err(err) => {
+                    return Err("error");
+                }
+            }
         }
-        Ok(())
+        Ok(ResultCode::NormalReturn)
     }
 }
 
