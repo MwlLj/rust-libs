@@ -32,7 +32,7 @@ fn dropTest() {
         let key = "1";
         values.insert(key, "test");
         assert_eq!(values.len(), 1);
-        let _d = defer(|| {
+        once_defer(|| {
             values.remove(key);
         });
     }
